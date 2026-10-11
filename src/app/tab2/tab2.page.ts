@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
+  AlertController,
   IonButton,
   IonContent,
   IonHeader,
@@ -14,6 +15,7 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  ToastController,
 } from '@ionic/angular';
 import { SavedCounter } from '../models/saved-counter';
 import { CounterService } from '../services/counter.service';
@@ -43,6 +45,8 @@ export type SortOption = 'newest' | 'oldest' | 'name' | 'value';
 })
 export class Tab2Page implements OnInit {
   readonly counterService = inject(CounterService);
+  private readonly alertController = inject(AlertController);
+  private readonly toastController = inject(ToastController);
 
   readonly searchTerm = signal('');
   readonly sortBy = signal<SortOption>('newest');
@@ -77,12 +81,35 @@ export class Tab2Page implements OnInit {
     this.sortBy.set(value);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.counterService.remove(id);
+  async remove(counter: SavedCounter): Promise<void> {
+    await this.counterService.remove(counter.id);
+    await this.showToast(`Záznam „${counter.name}“ byl odstraněn.`);
+  }
+
+  async confirmClear(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Vymazat historii?',
+      message: 'Opravdu chcete odstranit všechny záznamy? Akci nelze vrátit.',
+      buttons: [
+        { text: 'Zrušit', role: 'cancel' },
+        { text: 'Vymazat', role: 'destructive', handler: () => this.clear() },
+      ],
+    });
+    await alert.present();
   }
 
   async clear(): Promise<void> {
     await this.counterService.clear();
+    await this.showToast('Historie byla vymazána.');
+  }
+
+  private async showToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'top',
+    });
+    await toast.present();
   }
 
   private compare(a: SavedCounter, b: SavedCounter, sortBy: SortOption): number {

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ToastController } from '@ionic/angular';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SavedCounter } from '../models/saved-counter';
 import { CounterService } from '../services/counter.service';
@@ -18,9 +19,16 @@ describe('Tab1Page', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should pass the saved counter to CounterService', async () => {
+  it('should pass the saved counter to CounterService and show a toast', async () => {
     const service = TestBed.inject(CounterService);
     const addSpy = vi.spyOn(service, 'add').mockResolvedValue(undefined);
+
+    const present = vi.fn();
+    const toastController = TestBed.inject(ToastController);
+    const createSpy = vi
+      .spyOn(toastController, 'create')
+      .mockResolvedValue({ present } as unknown as HTMLIonToastElement);
+
     const counter: SavedCounter = {
       id: 'first',
       name: 'První',
@@ -31,5 +39,7 @@ describe('Tab1Page', () => {
     await component.onSaved(counter);
 
     expect(addSpy).toHaveBeenCalledWith(counter);
+    expect(createSpy).toHaveBeenCalled();
+    expect(present).toHaveBeenCalled();
   });
 });

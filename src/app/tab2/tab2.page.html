@@ -18,7 +18,7 @@
         <p>Počet záznamů: {{ counterService.counters().length }}</p>
         <p>Součet hodnot: <strong>{{ total() }}</strong></p>
       </div>
-      <ion-button color="danger" fill="outline" size="small" (click)="clear()">
+      <ion-button color="danger" fill="outline" size="small" (click)="confirmClear()">
         Vymazat vše
       </ion-button>
     </div>
@@ -61,7 +61,7 @@
               color="danger"
               fill="clear"
               aria-label="Odstranit záznam"
-              (click)="remove(counter.id)"
+              (click)="remove(counter)"
             >
               Odstranit
             </ion-button>
