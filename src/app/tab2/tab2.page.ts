@@ -51,14 +51,16 @@ export class Tab2Page implements OnInit {
   readonly searchTerm = signal('');
   readonly sortBy = signal<SortOption>('newest');
 
-  // Součet hodnot všech uložených počítadel (bez ohledu na vyhledávání).
-  readonly total = computed(() =>
-    this.counterService
-      .counters()
-      .reduce((sum, counter) => sum + counter.value, 0),
-  );
+    readonly valueStats = computed(() => {
+    const counters = this.counterService.counters();
 
-  // Záznamy po vyhledání podle názvu a seřazení.
+    return {
+      positive: counters.filter((counter) => counter.value > 0).length,
+      negative: counters.filter((counter) => counter.value < 0).length,
+      zero: counters.filter((counter) => counter.value === 0).length,
+    };
+  });
+
   readonly visibleCounters = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
 
