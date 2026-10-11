@@ -50,8 +50,13 @@ export class Tab2Page implements OnInit {
 
   readonly searchTerm = signal('');
   readonly sortBy = signal<SortOption>('newest');
+  readonly total = computed(() =>
+    this.counterService
+      .counters()
+      .reduce((sum, counter) => sum + counter.value, 0),
+  );
 
-    readonly valueStats = computed(() => {
+  readonly valueStats = computed(() => {
     const counters = this.counterService.counters();
 
     return {
@@ -60,6 +65,7 @@ export class Tab2Page implements OnInit {
       zero: counters.filter((counter) => counter.value === 0).length,
     };
   });
+
 
   readonly visibleCounters = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
